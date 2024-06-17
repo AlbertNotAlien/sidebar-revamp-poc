@@ -2,12 +2,26 @@
 import { useState } from 'react';
 
 function PeopleSidebar() {
+  useEffect(() => {
+    console.log('PeopleSidebar mounted');
+    return () => {
+      console.log('PeopleSidebar unmounted');
+    };
+  });
+
   return (
     <div className='w-[320px] grow bg-orange-600 rounded'>PeopleSidebar</div>
   );
 }
 
 function ChatSidebar() {
+  useEffect(() => {
+    console.log('ChatSidebar mounted');
+    return () => {
+      console.log('ChatSidebar unmounted');
+    };
+  });
+
   return (
     <div className='w-[320px] grow bg-orange-600 rounded'>ChatSidebar</div>
   );
