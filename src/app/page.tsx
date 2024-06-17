@@ -1,7 +1,9 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-function PeopleSidebar() {
+const peopleList = ['Alice', 'Bob', 'Charlie', 'David', 'Eve'];
+
+function PeopleSidebar({ peopleList }: { peopleList: string[] }) {
   useEffect(() => {
     console.log('PeopleSidebar mounted');
     return () => {
@@ -10,7 +12,12 @@ function PeopleSidebar() {
   });
 
   return (
-    <div className='w-[320px] grow bg-orange-600 rounded'>PeopleSidebar</div>
+    <div className='w-[320px] grow bg-orange-600 rounded'>
+      <p>PeopleSidebar</p>
+      {peopleList.map((person) => (
+        <p key={person}>{person}</p>
+      ))}
+    </div>
   );
 }
 
@@ -51,19 +58,19 @@ export default function Home() {
       <nav className='w-full h-7 flex space gap-x-4'>
         <button
           onClick={() => toggleSidebar('people')}
-          className='w-20 h-full bg-blue-500 p-3 flex justify-center items-center rounded'
+          className='w-32 h-full bg-blue-500 p-3 flex justify-center items-center rounded'
         >
-          People
+          {`People (${peopleList.length})`}
         </button>
         <button
           onClick={() => toggleSidebar('chat')}
-          className='w-20 h-full bg-blue-500 p-3 flex justify-center items-center rounded'
+          className='w-32 h-full bg-blue-500 p-3 flex justify-center items-center rounded'
         >
           Chat
         </button>
       </nav>
       <div className='w-full grow h-full py-5 flex flex-col bg-slate-500'>
-        {sidebarId === 'people' && <PeopleSidebar />}
+        {sidebarId === 'people' && <PeopleSidebar peopleList={peopleList} />}
         {sidebarId === 'chat' && <ChatSidebar />}
       </div>
     </main>
