@@ -1,9 +1,28 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { create } from 'zustand';
 
-const peopleList = ['Alice', 'Bob', 'Charlie', 'David', 'Eve'];
+const defaultPeopleList = ['Alice', 'Bob', 'Charlie', 'David', 'Eve'];
 
-function PeopleSidebar({ peopleList }: { peopleList: string[] }) {
+interface PeopleState {
+  peopleList: string[];
+  setPeopleList: (peopleList: string[]) => void;
+  increasePerson: () => void;
+}
+
+const usePeopleStore = create<PeopleState>((set) => ({
+  peopleList: [],
+  setPeopleList: (peopleList) => set({ peopleList }),
+  increasePerson: () =>
+    set((state) => ({ peopleList: [...state.peopleList, 'New Person'] })),
+}));
+
+function PeopleSidebar() {
+  const { peopleList, increasePerson } = usePeopleStore((state) => ({
+    peopleList: state.peopleList,
+    increasePerson: state.increasePerson,
+  }));
+
   useEffect(() => {
     console.log('PeopleSidebar mounted');
     return () => {
@@ -17,7 +36,44 @@ function PeopleSidebar({ peopleList }: { peopleList: string[] }) {
       {peopleList.map((person) => (
         <p key={person}>{person}</p>
       ))}
+      <button
+        className='w-[100px] bg-red-400 h-[20px]'
+        onClick={increasePerson}
+      >
+        add
+      </button>
     </div>
+  );
+}
+
+function PeopleToolbarButton({
+  openPeopleSidebar,
+}: {
+  openPeopleSidebar: () => void;
+}) {
+  const { peopleList, setPeopleList } = usePeopleStore((state) => ({
+    peopleList: state.peopleList,
+    setPeopleList: state.setPeopleList,
+  }));
+
+  useEffect(() => {
+    setPeopleList(defaultPeopleList);
+  }, [setPeopleList]);
+
+  useEffect(() => {
+    console.log('PeopleToolbarButton mounted');
+    return () => {
+      console.log('PeopleToolbarButton unmounted');
+    };
+  });
+
+  return (
+    <button
+      onClick={openPeopleSidebar}
+      className='w-32 h-full bg-blue-500 p-3 flex justify-center items-center rounded'
+    >
+      {`People (${peopleList.length})`}
+    </button>
   );
 }
 
@@ -53,15 +109,19 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    console.log('Home mounted');
+    return () => {
+      console.log('Home unmounted');
+    };
+  });
+
   return (
     <main className='flex min-h-screen flex-col items-center justify-between bg-yellow-400'>
       <nav className='w-full h-7 flex space gap-x-4'>
-        <button
-          onClick={() => toggleSidebar('people')}
-          className='w-32 h-full bg-blue-500 p-3 flex justify-center items-center rounded'
-        >
-          {`People (${peopleList.length})`}
-        </button>
+        <PeopleToolbarButton
+          openPeopleSidebar={() => toggleSidebar('people')}
+        />
         <button
           onClick={() => toggleSidebar('chat')}
           className='w-32 h-full bg-blue-500 p-3 flex justify-center items-center rounded'
@@ -70,7 +130,7 @@ export default function Home() {
         </button>
       </nav>
       <div className='w-full grow h-full py-5 flex flex-col bg-slate-500'>
-        {sidebarId === 'people' && <PeopleSidebar peopleList={peopleList} />}
+        {sidebarId === 'people' && <PeopleSidebar />}
         {sidebarId === 'chat' && <ChatSidebar />}
       </div>
     </main>
